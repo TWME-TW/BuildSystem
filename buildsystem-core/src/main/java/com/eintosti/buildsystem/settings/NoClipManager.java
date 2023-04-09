@@ -105,7 +105,7 @@ public class NoClipManager {
     }
 
     private boolean isSolidBlock(Block block) {
-        return block.getType() != Material.AIR;
+        return !(block.isPassable());
     }
 
     public boolean isNoClip(UUID uuid) {

@@ -37,12 +37,14 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.File;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,12 +97,22 @@ public class WorldManager {
     }
 
     /**
+     * Adds a {@link BuildWorld} to the list of all worlds.
+     *
+     * @param buildWorld The world to add
+     */
+    public void addBuildWorld(BuildWorld buildWorld) {
+        this.buildWorlds.put(buildWorld.getName(), buildWorld);
+    }
+
+    /**
      * Gets a list of all {@link BuildWorld}s.
      *
      * @return A list of all worlds
      */
+    @Unmodifiable
     public Collection<BuildWorld> getBuildWorlds() {
-        return buildWorlds.values();
+        return Collections.unmodifiableCollection(buildWorlds.values());
     }
 
     /**
@@ -174,7 +186,6 @@ public class WorldManager {
             } else {
                 createWorld(player, worldName, worldType, null, template, privateWorld);
             }
-
         });
     }
 
@@ -202,7 +213,7 @@ public class WorldManager {
         new BuildWorldCreator(plugin, worldName)
                 .setType(worldType)
                 .setTemplate(template)
-                .setPrivate(privateWorld && getBuildWorld(player.getName()) == null)
+                .setPrivate(privateWorld)
                 .setCustomGenerator(customGenerator)
                 .createWorld(player);
     }
@@ -279,7 +290,7 @@ public class WorldManager {
                 .setPrivate(false)
                 .setCreationDate(FileUtils.getDirectoryCreation(new File(Bukkit.getWorldContainer(), worldName)));
 
-        if (worldCreator.parseDataVersion() > plugin.getServerVersion().getDataVersion()) {
+        if (worldCreator.isHigherVersion()) {
             String key = single ? "import" : "importall";
             Messages.sendMessage(player, "worlds_" + key + "_newer_version", new AbstractMap.SimpleEntry<>("%world%", worldName));
             return false;
@@ -380,7 +391,7 @@ public class WorldManager {
      */
     public void unimportWorld(BuildWorld buildWorld, boolean save) {
         buildWorld.forceUnload(save);
-        this.buildWorlds.remove(buildWorld);
+        this.buildWorlds.remove(buildWorld.getName());
         removePlayersFromWorld(buildWorld.getName(), Messages.getString("worlds_unimport_players_world"));
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             this.worldConfig.getFile().set("worlds." + buildWorld.getName(), null);
@@ -683,7 +694,7 @@ public class WorldManager {
         String generatorName = configuration.getString("worlds." + worldName + ".chunk-generator");
         CustomGenerator customGenerator = new CustomGenerator(generatorName, parseChunkGenerator(worldName, generatorName));
 
-        this.buildWorlds.put(worldName, new BuildWorld(
+        this.addBuildWorld(new BuildWorld(
                 worldName,
                 creator,
                 creatorId,

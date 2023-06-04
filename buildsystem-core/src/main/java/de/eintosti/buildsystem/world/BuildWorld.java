@@ -32,7 +32,6 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -282,16 +281,6 @@ public class BuildWorld implements ConfigurationSerializable {
     }
 
     /**
-     * Get the creation date in the format provided by the config.
-     *
-     * @return The formatted creation date
-     * @see BuildWorld#getCreationDate()
-     */
-    public String getFormattedCreationDate() {
-        return creationDate > 0 ? new SimpleDateFormat(configValues.getDateFormat()).format(creationDate) : "-";
-    }
-
-    /**
      * Get the custom chunk generator used to generate the world.
      *
      * @return The custom chunk generator used to generate the world.
@@ -305,7 +294,7 @@ public class BuildWorld implements ConfigurationSerializable {
      * Get the display name of a {@link Difficulty}.
      *
      * @return the difficulty's display name
-     * @see WorldData#DIFFICULTY
+     * @see WorldData#difficulty()
      */
     public String getDifficultyName() {
         switch (worldData.difficulty().get()) {
@@ -586,7 +575,10 @@ public class BuildWorld implements ConfigurationSerializable {
         }
 
         plugin.getLogger().info("*** Loading world \"" + name + "\" ***");
-        new BuildWorldCreator(plugin, this).generateBukkitWorld();
+        World world = new BuildWorldCreator(plugin, this).generateBukkitWorld();
+        if (world == null) {
+            return;
+        }
 
         this.worldData.lastLoaded().set(System.currentTimeMillis());
         this.loaded = true;

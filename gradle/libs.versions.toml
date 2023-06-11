@@ -1,6 +1,6 @@
 [versions]
 # Platform expectations
-spigot = "1.19.3-R0.1-SNAPSHOT"
+spigot = "1.20-R0.1-SNAPSHOT"
 paperlib = "1.0.8"
 
 # Plugins
@@ -12,9 +12,9 @@ placeholderapi = "2.11.3"
 annotations = "24.0.1"
 authlib = "1.5.25"
 bstats = "3.0.2"
-fastboard = "1.2.1"
+fastboard = "2.0.0"
 nbt = "1.5.1"
-xseries = "9.3.1"
+xseries = "9.4.0"
 
 [libraries]
 #Platform expectations

@@ -171,6 +171,7 @@ public class BuildWorld implements ConfigurationSerializable {
      */
     public void setName(String name) {
         this.name = name;
+        this.worldData.setWorldName(name);
     }
 
     /**
@@ -509,16 +510,16 @@ public class BuildWorld implements ConfigurationSerializable {
             return;
         }
 
+        if (configValues.getBlackListedWorldsToUnload().contains(name) || isSpawnWorld(bukkitWorld)) {
+            return;
+        }
+
         forceUnload(true);
     }
 
     public void forceUnload(boolean save) {
         World bukkitWorld = getWorld();
         if (bukkitWorld == null) {
-            return;
-        }
-
-        if (configValues.getBlackListedWorldsToUnload().contains(name) || isSpawnWorld(bukkitWorld)) {
             return;
         }
 

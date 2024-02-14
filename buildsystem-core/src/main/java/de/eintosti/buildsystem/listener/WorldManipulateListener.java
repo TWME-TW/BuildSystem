@@ -1,9 +1,19 @@
 /*
- * Copyright (c) 2023, Thomas Meaney
- * All rights reserved.
+ * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) contributors
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package de.eintosti.buildsystem.listener;
 
@@ -55,7 +65,7 @@ public class WorldManipulateListener implements Listener {
         WorldData worldData = buildWorld.getData();
         if (!manageWorldInteraction(player, event, worldData.blockBreaking().get())) {
             worldData.lastEdited().set(System.currentTimeMillis());
-            setStatus(worldData, player);
+            updateStatus(worldData, player);
         }
     }
 
@@ -74,7 +84,7 @@ public class WorldManipulateListener implements Listener {
         WorldData worldData = buildWorld.getData();
         if (!manageWorldInteraction(player, event, worldData.blockPlacement().get())) {
             worldData.lastEdited().set(System.currentTimeMillis());
-            setStatus(worldData, player);
+            updateStatus(worldData, player);
         }
     }
 
@@ -167,7 +177,7 @@ public class WorldManipulateListener implements Listener {
     }
 
     private boolean disableArchivedWorlds(BuildWorld buildWorld, Player player, Event event) {
-        if (worldManager.canBypassBuildRestriction(player)) {
+        if (worldManager.canBypassBuildRestriction(player) || player.hasPermission("buildsystem.bypass.archive")) {
             return false;
         }
 
@@ -195,7 +205,7 @@ public class WorldManipulateListener implements Listener {
     }
 
     private boolean checkBuilders(BuildWorld buildWorld, Player player, Event event) {
-        if (worldManager.canBypassBuildRestriction(player)) {
+        if (worldManager.canBypassBuildRestriction(player) || player.hasPermission("buildsystem.bypass.builders")) {
             return false;
         }
 
@@ -219,7 +229,7 @@ public class WorldManipulateListener implements Listener {
         }
     }
 
-    private void setStatus(WorldData worldData, Player player) {
+    private void updateStatus(WorldData worldData, Player player) {
         if (worldData.status().get() == WorldStatus.NOT_STARTED) {
             worldData.status().set(WorldStatus.IN_PROGRESS);
             plugin.getPlayerManager().forceUpdateSidebar(player);

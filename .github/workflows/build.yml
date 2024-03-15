@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ 17 ]
+        java: [ 21 ]
       fail-fast: true
 
     steps:
@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4.1.1
 
       - name: JDK ${{ matrix.java }}
-        uses: actions/setup-java@v4.0.0
+        uses: actions/setup-java@v4.1.0
         with:
           java-version: ${{ matrix.java }}
           cache: 'gradle'

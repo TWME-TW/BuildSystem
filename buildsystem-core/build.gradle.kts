@@ -47,10 +47,6 @@ tasks {
         dependsOn(shadowJar)
     }
 
-    compileJava {
-        options.encoding = Charsets.UTF_8.name()
-    }
-
     shadowJar {
         dependsOn(project.project(":buildsystem-abstraction").subprojects.map {
             it.tasks.named("assemble")

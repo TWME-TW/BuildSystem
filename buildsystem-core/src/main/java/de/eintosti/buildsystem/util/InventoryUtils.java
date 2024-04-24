@@ -185,7 +185,7 @@ public class InventoryUtils {
 
     public ItemStack getSkull(String displayName, String skullOwner, List<String> lore) {
         ItemStack skull = XMaterial.PLAYER_HEAD.parseItem();
-        SkullMeta skullMeta = SkullUtils.applySkin(skull.getItemMeta(), skullOwner);
+        SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
 
         skullMeta.setDisplayName(displayName);
         skullMeta.setLore(lore);

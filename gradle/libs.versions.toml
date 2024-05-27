@@ -6,15 +6,15 @@ paperlib = "1.0.8"
 # Plugins
 luckperms = "5.4"
 worldedit = "7.2.20"
-placeholderapi = "2.11.5"
+placeholderapi = "2.11.6"
 
 # Third Party
 annotations = "24.1.0"
 authlib = "1.5.25"
 bstats = "3.0.2"
-fastboard = "2.1.0"
+fastboard = "2.1.2"
 nbt = "1.5.1"
-xseries = "9.10.0"
+xseries = "10.0.0"
 
 [libraries]
 # Platform expectations

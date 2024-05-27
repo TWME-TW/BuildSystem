@@ -134,6 +134,8 @@ public class BuildSystem extends JavaPlugin {
     private LuckPermsExpansion luckPermsExpansion;
     private PlaceholderApiExpansion placeholderApiExpansion;
 
+    private static BuildSystem instance;
+
     @Override
     public void onLoad() {
         createTemplateFolder();
@@ -142,6 +144,7 @@ public class BuildSystem extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        instance = this;
         this.getConfig().options().copyDefaults(true);
         this.saveConfig();
         this.configValues = new ConfigValues(this);
@@ -527,5 +530,9 @@ public class BuildSystem extends JavaPlugin {
 
     public GameRules getGameRules() {
         return gameRules;
+    }
+
+    public static BuildSystem getInstance() {
+        return instance;
     }
 }

@@ -23,17 +23,21 @@ import com.cryptomorin.xseries.XTag;
 import com.google.common.collect.Sets;
 import de.eintosti.buildsystem.BuildSystem;
 import de.eintosti.buildsystem.config.ConfigValues;
-import de.eintosti.buildsystem.player.PlayerManager;
 import de.eintosti.buildsystem.settings.Settings;
 import de.eintosti.buildsystem.settings.SettingsManager;
 import de.eintosti.buildsystem.util.MaterialUtils;
 import de.eintosti.buildsystem.version.customblocks.CustomBlocks;
 import de.eintosti.buildsystem.version.util.DirectionUtil;
+import de.eintosti.buildsystem.version.util.MinecraftVersion;
 import de.eintosti.buildsystem.world.BuildWorld;
 import de.eintosti.buildsystem.world.Builder;
 import de.eintosti.buildsystem.world.WorldManager;
 import de.eintosti.buildsystem.world.data.WorldData;
 import de.eintosti.buildsystem.world.data.WorldStatus;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -51,17 +55,19 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
 public class SettingsInteractListener implements Listener {
+
+    private static final EnumSet<XMaterial> OTHER_PLANTS = Sets.newEnumSet(Sets.newHashSet(
+            XMaterial.TORCHFLOWER, XMaterial.PITCHER_PLANT, XMaterial.LILY_PAD, XMaterial.PINK_PETALS,
+            XMaterial.BROWN_MUSHROOM, XMaterial.RED_MUSHROOM, XMaterial.CRIMSON_FUNGUS, XMaterial.WARPED_FUNGUS,
+            XMaterial.SHORT_GRASS, XMaterial.FERN, XMaterial.DEAD_BUSH, XMaterial.LARGE_FERN, XMaterial.TALL_GRASS,
+            XMaterial.NETHER_SPROUTS, XMaterial.WARPED_ROOTS, XMaterial.CRIMSON_ROOTS, XMaterial.SUGAR_CANE, XMaterial.BAMBOO,
+            XMaterial.BIG_DRIPLEAF, XMaterial.SMALL_DRIPLEAF, XMaterial.SEAGRASS, XMaterial.SWEET_BERRIES
+    ), XMaterial.class);
 
     private final ConfigValues configValues;
     private final CustomBlocks customBlocks;
 
-    private final PlayerManager playerManager;
     private final SettingsManager settingsManager;
     private final WorldManager worldManager;
 
@@ -71,7 +77,6 @@ public class SettingsInteractListener implements Listener {
         this.configValues = plugin.getConfigValues();
         this.customBlocks = plugin.getCustomBlocks();
 
-        this.playerManager = plugin.getPlayerManager();
         this.settingsManager = plugin.getSettingsManager();
         this.worldManager = plugin.getWorldManager();
 
@@ -91,35 +96,36 @@ public class SettingsInteractListener implements Listener {
             return;
         }
 
-        boolean duelHanded = XMaterial.supports(9);
+        boolean duelHanded = MinecraftVersion.getCurrent().isEqualOrHigherThan(MinecraftVersion.COMBAT_9);
         if (duelHanded && event.getHand() != EquipmentSlot.valueOf("HAND")) {
             return;
         }
 
         Player player = event.getPlayer();
+        if (player.isSneaking() || event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+
         Settings settings = settingsManager.getSettings(player);
         if (!settings.isTrapDoor()) {
             return;
         }
 
-        Action action = event.getAction();
         XMaterial material = XMaterial.matchXMaterial(block.getType());
-        if (action == Action.RIGHT_CLICK_BLOCK && (material == XMaterial.IRON_DOOR || material == XMaterial.IRON_TRAPDOOR)) {
-            if (player.isSneaking()) {
-                return;
-            }
+        if (material != XMaterial.IRON_DOOR && material != XMaterial.IRON_TRAPDOOR) {
+            return;
+        }
 
-            event.setCancelled(true);
-            switch (material) {
-                case IRON_TRAPDOOR:
-                    customBlocks.toggleIronTrapdoor(event);
-                    break;
-                case IRON_DOOR:
-                    customBlocks.toggleIronDoor(event);
-                    break;
-                default:
-                    break;
-            }
+        event.setCancelled(true);
+        switch (material) {
+            case IRON_TRAPDOOR:
+                customBlocks.toggleIronTrapdoor(event);
+                break;
+            case IRON_DOOR:
+                customBlocks.toggleIronDoor(event);
+                break;
+            default:
+                break;
         }
     }
 
@@ -168,14 +174,6 @@ public class SettingsInteractListener implements Listener {
         customBlocks.setPlant(event);
     }
 
-    private static final EnumSet<XMaterial> OTHER_PLANTS = Sets.newEnumSet(Sets.newHashSet(
-            XMaterial.TORCHFLOWER, XMaterial.PITCHER_PLANT, XMaterial.LILY_PAD, XMaterial.PINK_PETALS,
-            XMaterial.BROWN_MUSHROOM, XMaterial.RED_MUSHROOM, XMaterial.CRIMSON_FUNGUS, XMaterial.WARPED_FUNGUS,
-            XMaterial.SHORT_GRASS, XMaterial.FERN, XMaterial.DEAD_BUSH, XMaterial.LARGE_FERN, XMaterial.TALL_GRASS,
-            XMaterial.NETHER_SPROUTS, XMaterial.WARPED_ROOTS, XMaterial.CRIMSON_ROOTS, XMaterial.SUGAR_CANE, XMaterial.BAMBOO,
-            XMaterial.BIG_DRIPLEAF, XMaterial.SMALL_DRIPLEAF, XMaterial.SEAGRASS, XMaterial.SWEET_BERRIES
-    ), XMaterial.class);
-
     @EventHandler
     public void manageInstantPlaceSignsSetting(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK || !isValid(event)) {
@@ -220,7 +218,7 @@ public class SettingsInteractListener implements Listener {
                 if (isHangingSign) {
                     return;
                 }
-                if (!XMaterial.supports(13)) {
+                if (MinecraftVersion.getCurrent().isLowerThan(MinecraftVersion.AQUATIC_13)) {
                     material = Material.getMaterial("SIGN_POST") != null ? Material.valueOf("SIGN_POST") : material;
                 }
                 adjacent.setType(material);
@@ -292,12 +290,13 @@ public class SettingsInteractListener implements Listener {
         event.setUseItemInHand(Event.Result.DENY);
         event.setUseInteractedBlock(Event.Result.DENY);
 
-        if (!XMaterial.supports(13) && XTag.isItem(xMaterial)) {
+        boolean preFlattening = MinecraftVersion.getCurrent().isLowerThan(MinecraftVersion.AQUATIC_13);
+        if (preFlattening && XTag.isItem(xMaterial)) {
             material = Material.valueOf(material.toString().replace("_ITEM", ""));
         }
 
         if (XTag.SIGNS.isTagged(xMaterial) && event.getBlockFace() != BlockFace.UP) {
-            if (!XMaterial.supports(13)) {
+            if (preFlattening) {
                 material = Material.valueOf("WALL_SIGN");
             } else {
                 String[] splitMaterial = material.toString().split("_");
@@ -363,7 +362,9 @@ public class SettingsInteractListener implements Listener {
             return false;
         }
 
-        if (buildWorld.getData().buildersEnabled().get() && !buildWorld.isBuilder(player) && !player.hasPermission("buildsystem.bypass.builders")) {
+        if (buildWorld.getData().buildersEnabled().get()
+                && !buildWorld.isBuilder(player)
+                && !player.hasPermission("buildsystem.bypass.builders")) {
             return buildWorld.isCreator(player);
         }
 
@@ -371,8 +372,8 @@ public class SettingsInteractListener implements Listener {
     }
 
     /**
-     * Stop {@link Player} from opening {@link Inventory} because the event should be cancelled
-     * as it was fired due to an interaction caused in {@link SettingsInteractListener#manageDisabledInteractSetting}
+     * Stop {@link Player} from opening {@link Inventory} because the event should be cancelled as it was fired due to
+     * an interaction caused in {@link SettingsInteractListener#manageDisabledInteractSetting}
      */
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent event) {

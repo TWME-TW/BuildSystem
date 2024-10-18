@@ -28,6 +28,10 @@ import de.eintosti.buildsystem.util.InventoryUtils;
 import de.eintosti.buildsystem.util.PaginatedInventory;
 import de.eintosti.buildsystem.world.WorldManager;
 import de.eintosti.buildsystem.world.data.WorldType;
+import java.io.File;
+import java.io.FileFilter;
+import java.util.AbstractMap;
+import java.util.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -36,11 +40,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.util.AbstractMap;
-import java.util.Locale;
 
 public class CreateInventory extends PaginatedInventory implements Listener {
 
@@ -119,18 +118,19 @@ public class CreateInventory extends PaginatedInventory implements Listener {
     }
 
     private void addTemplates(Player player, Page page) {
-        File[] templateFiles = new File(plugin.getDataFolder() + File.separator + "templates").listFiles(new TemplateFilter());
+        File[] templateFiles = new File(plugin.getDataFolder() + File.separator + "templates")
+                .listFiles(new TemplateFilter());
 
         int columnTemplate = 29, maxColumnTemplate = 33;
         int fileLength = templateFiles != null ? templateFiles.length : 0;
         this.numTemplates = (fileLength / MAX_TEMPLATES) + (fileLength % MAX_TEMPLATES == 0 ? 0 : 1);
-        int numInventories = (numTemplates % MAX_TEMPLATES == 0 ? numTemplates : numTemplates + 1) != 0 ? (numTemplates % MAX_TEMPLATES == 0 ? numTemplates : numTemplates + 1) : 1;
-
-        inventories = new Inventory[numInventories];
-        Inventory inventory = getInventory(player, page);
+        int numInventories = numTemplates % MAX_TEMPLATES == 0 ? Math.max(numTemplates, 1) : numTemplates + 1;
 
         int index = 0;
+        Inventory inventory = getInventory(player, page);
+        inventories = new Inventory[numInventories];
         inventories[index] = inventory;
+
         if (numTemplates == 0) {
             for (int i = 29; i <= 33; i++) {
                 inventoryUtils.addItemStack(inventory, i, XMaterial.BARRIER, Messages.getString("create_no_templates", player));
@@ -230,7 +230,8 @@ public class CreateInventory extends PaginatedInventory implements Listener {
                         break;
                 }
 
-                if (worldType == null || !player.hasPermission("buildsystem.create.type." + worldType.name().toLowerCase(Locale.ROOT))) {
+                if (worldType == null || !player.hasPermission(
+                        "buildsystem.create.type." + worldType.name().toLowerCase(Locale.ROOT))) {
                     XSound.ENTITY_ITEM_BREAK.play(player);
                     return;
                 }
@@ -257,7 +258,8 @@ public class CreateInventory extends PaginatedInventory implements Listener {
                 XMaterial xMaterial = XMaterial.matchXMaterial(itemStack);
                 switch (xMaterial) {
                     case FILLED_MAP:
-                        worldManager.startWorldNameInput(player, WorldType.TEMPLATE, itemStack.getItemMeta().getDisplayName(), createPrivateWorld);
+                        worldManager.startWorldNameInput(player, WorldType.TEMPLATE, itemStack.getItemMeta()
+                                .getDisplayName(), createPrivateWorld);
                         break;
                     case PLAYER_HEAD:
                         if (slot == 38 && !decrementInv(player, numTemplates, MAX_TEMPLATES)) {

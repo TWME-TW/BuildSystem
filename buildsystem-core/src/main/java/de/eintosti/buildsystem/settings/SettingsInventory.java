@@ -25,6 +25,7 @@ import de.eintosti.buildsystem.Messages;
 import de.eintosti.buildsystem.config.ConfigValues;
 import de.eintosti.buildsystem.navigator.settings.NavigatorType;
 import de.eintosti.buildsystem.util.InventoryUtils;
+import de.eintosti.buildsystem.version.util.MinecraftVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -65,12 +66,15 @@ public class SettingsInventory implements Listener {
         addSettingsItem(player, inventory, 14, XMaterial.ENDER_EYE, settings.isHidePlayers(), "settings_hideplayers_item", "settings_hideplayers_lore");
         addSettingsItem(player, inventory, 15, XMaterial.OAK_SIGN, settings.isInstantPlaceSigns(), "settings_instantplacesigns_item", "settings_instantplacesigns_lore");
         addSettingsItem(player, inventory, 20, XMaterial.SLIME_BLOCK, settings.isKeepNavigator(), "settings_keep_navigator_item", "settings_keep_navigator_lore");
-        addSettingsItem(player, inventory, 21, configValues.getNavigatorItem(), settings.getNavigatorType() == NavigatorType.NEW, "settings_new_navigator_item", "settings_new_navigator_lore");
+        addSettingsItem(player, inventory, 21, configValues.getNavigatorItem(), settings.getNavigatorType()
+                == NavigatorType.NEW, "settings_new_navigator_item", "settings_new_navigator_lore");
         addSettingsItem(player, inventory, 22, XMaterial.GOLDEN_CARROT, settings.isNightVision(), "settings_nightvision_item", "settings_nightvision_lore");
         addSettingsItem(player, inventory, 23, XMaterial.BRICKS, settings.isNoClip(), "settings_no_clip_item", "settings_no_clip_lore");
         addSettingsItem(player, inventory, 24, XMaterial.IRON_TRAPDOOR, settings.isTrapDoor(), "settings_open_trapdoors_item", "settings_open_trapdoors_lore");
         addSettingsItem(player, inventory, 29, XMaterial.FERN, settings.isPlacePlants(), "settings_placeplants_item", "settings_placeplants_lore");
-        addSettingsItem(player, inventory, 30, XMaterial.PAPER, settings.isScoreboard(), configValues.isScoreboard() ? "settings_scoreboard_item" : "settings_scoreboard_disabled_item", configValues.isScoreboard() ? "settings_scoreboard_lore" : "settings_scoreboard_disabled_lore");
+        addSettingsItem(player, inventory, 30, XMaterial.PAPER, settings.isScoreboard(),
+                configValues.isScoreboard() ? "settings_scoreboard_item" : "settings_scoreboard_disabled_item",
+                configValues.isScoreboard() ? "settings_scoreboard_lore" : "settings_scoreboard_disabled_lore");
         addSettingsItem(player, inventory, 31, getSlabBreakingMaterial(), settings.isSlabBreaking(), "settings_slab_breaking_item", "settings_slab_breaking_lore");
         addSettingsItem(player, inventory, 32, XMaterial.MAGMA_CREAM, settings.isSpawnTeleport(), "settings_spawnteleport_item", "settings_spawnteleport_lore");
 
@@ -78,7 +82,9 @@ public class SettingsInventory implements Listener {
     }
 
     private XMaterial getSlabBreakingMaterial() {
-        return XMaterial.supports(13) ? XMaterial.SMOOTH_STONE_SLAB : XMaterial.STONE_SLAB;
+        return MinecraftVersion.getCurrent().isEqualOrHigherThan(MinecraftVersion.AQUATIC_13)
+                ? XMaterial.SMOOTH_STONE_SLAB
+                : XMaterial.STONE_SLAB;
     }
 
     public void openInventory(Player player) {

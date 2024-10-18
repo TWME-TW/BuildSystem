@@ -17,11 +17,11 @@
  */
 package de.eintosti.buildsystem.world;
 
-import com.cryptomorin.xseries.XMaterial;
 import de.eintosti.buildsystem.BuildSystem;
 import de.eintosti.buildsystem.Messages;
 import de.eintosti.buildsystem.config.ConfigValues;
 import de.eintosti.buildsystem.util.FileUtils;
+import de.eintosti.buildsystem.version.util.MinecraftVersion;
 import de.eintosti.buildsystem.world.data.WorldType;
 import de.eintosti.buildsystem.world.generator.CustomGenerator;
 import de.eintosti.buildsystem.world.generator.voidgenerator.DeprecatedVoidGenerator;
@@ -30,6 +30,10 @@ import dev.dewy.nbt.Nbt;
 import dev.dewy.nbt.io.CompressionType;
 import dev.dewy.nbt.tags.collection.CompoundTag;
 import dev.dewy.nbt.tags.primitive.IntTag;
+import java.io.File;
+import java.io.IOException;
+import java.util.AbstractMap;
+import java.util.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
@@ -39,11 +43,6 @@ import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.AbstractMap;
-import java.util.Locale;
 
 /**
  * @author Trichtern
@@ -122,10 +121,9 @@ public class BuildWorldCreator {
     }
 
     /**
-     * Depending on the {@link BuildWorld}'s {@link WorldType}, the corresponding {@link World} will be generated in
-     * a different way.
-     * Then, if the creation of the world was successful and the config is set accordingly, the player is teleported
-     * to the world.
+     * Depending on the {@link BuildWorld}'s {@link WorldType}, the corresponding {@link World} will be generated in a
+     * different way. Then, if the creation of the world was successful and the config is set accordingly, the player is
+     * teleported to the world.
      *
      * @param player The player who is creating the world
      */
@@ -242,7 +240,7 @@ public class BuildWorldCreator {
                 bukkitWorld.setSpawnLocation(0, 65, 0);
                 break;
             case FLAT:
-                int y = XMaterial.supports(18) ? -60 : 4;
+                int y = MinecraftVersion.getCurrent().isEqualOrHigherThan(MinecraftVersion.CAVES_18) ? -60 : 4;
                 bukkitWorld.setSpawnLocation(0, y, 0);
                 break;
             default:
@@ -279,9 +277,10 @@ public class BuildWorldCreator {
             case VOID:
                 worldCreator.generateStructures(false);
                 bukkitWorldType = org.bukkit.WorldType.FLAT;
-                if (XMaterial.supports(17)) {
+                MinecraftVersion minecraftVersion = MinecraftVersion.getCurrent();
+                if (minecraftVersion.isEqualOrHigherThan(MinecraftVersion.CAVES_17)) {
                     worldCreator.generator(new ModernVoidGenerator());
-                } else if (XMaterial.supports(13)) {
+                } else if (minecraftVersion.isEqualOrHigherThan(MinecraftVersion.AQUATIC_13)) {
                     worldCreator.generator(new DeprecatedVoidGenerator());
                 } else {
                     worldCreator.generatorSettings("2;0;1");
@@ -374,8 +373,7 @@ public class BuildWorldCreator {
 
     /**
      * The {@code level.dat} file is not updated when a newer Minecraft version loads chunks, making the world not
-     * loadable.
-     * Therefore, manually sets the world's {@code DataVersion} to the current server version, if lower.
+     * loadable. Therefore, manually sets the world's {@code DataVersion} to the current server version, if lower.
      */
     private void updateDataVersion() {
         File levelFile = new File(Bukkit.getWorldContainer() + File.separator + worldName, "level.dat");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@ public class BuildSystemCommand extends PagedCommand implements CommandExecutor 
     private final BuildSystem plugin;
 
     public BuildSystemCommand(BuildSystem plugin) {
-        super("buildsystem_permission", "buildsystem_title_with_page");
+        super("buildsystem_title_with_page", "buildsystem_permission");
 
         this.plugin = plugin;
         plugin.getCommand("buildsystem").setExecutor(this);
@@ -45,7 +45,12 @@ public class BuildSystemCommand extends PagedCommand implements CommandExecutor 
             plugin.getLogger().warning(Messages.getString("sender_not_player", null));
             return true;
         }
+
         Player player = (Player) sender;
+        if (!player.hasPermission("buildsystem.help.buildsystem")) {
+            plugin.sendPermissionMessage(player);
+            return true;
+        }
 
         if (args.length == 0) {
             sendMessage(player, 1);

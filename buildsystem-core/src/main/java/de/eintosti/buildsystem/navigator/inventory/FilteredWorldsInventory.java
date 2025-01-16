@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -194,16 +194,7 @@ public class FilteredWorldsInventory extends PaginatedInventory implements Liste
             return false;
         }
 
-        if (player.hasPermission(BuildSystem.ADMIN_PERMISSION)) {
-            return true;
-        }
-
-        if (buildWorld.isCreator(player) || buildWorld.isBuilder(player)) {
-            return true;
-        }
-
-        String worldPermission = worldData.permission().get();
-        if (!worldPermission.equalsIgnoreCase("-") && !player.hasPermission(worldPermission)) {
+        if (!worldManager.canEnter(player, buildWorld)) {
             return false;
         }
 
@@ -227,9 +218,9 @@ public class FilteredWorldsInventory extends PaginatedInventory implements Liste
 
         switch (event.getSlot()) {
             case 45:
-                WorldSort newSort =
-                        event.isLeftClick() ? worldDisplay.getWorldSort().getNext()
-                                : worldDisplay.getWorldSort().getPrevious();
+                WorldSort newSort = event.isLeftClick()
+                        ? worldDisplay.getWorldSort().getNext()
+                        : worldDisplay.getWorldSort().getPrevious();
                 worldDisplay.setWorldSort(newSort);
                 openInventory(player);
                 return;
@@ -254,7 +245,7 @@ public class FilteredWorldsInventory extends PaginatedInventory implements Liste
                 }
                 return;
             case 49:
-                if (itemStack.getType() == XMaterial.PLAYER_HEAD.parseMaterial()) {
+                if (itemStack.getType() == XMaterial.PLAYER_HEAD.get()) {
                     XSound.ENTITY_CHICKEN_EGG.play(player);
                     plugin.getCreateInventory().openInventory(player, CreateInventory.Page.PREDEFINED, visibility);
                     return;
@@ -275,11 +266,20 @@ public class FilteredWorldsInventory extends PaginatedInventory implements Liste
         inventoryUtils.manageInventoryClick(event, player, itemStack);
     }
 
+    /**
+     * The visibility settings for a {@link BuildWorld}.
+     */
     public enum Visibility {
         PRIVATE,
         PUBLIC,
         IGNORE;
 
+        /**
+         * Matches the visibility based on whether the world is private.
+         *
+         * @param isPrivateWorld Whether the world is private
+         * @return The corresponding visibility
+         */
         public static Visibility matchVisibility(boolean isPrivateWorld) {
             return isPrivateWorld ? PRIVATE : PUBLIC;
         }

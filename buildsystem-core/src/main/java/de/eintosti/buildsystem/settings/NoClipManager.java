@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -143,8 +143,7 @@ public class NoClipManager {
     }
 
     /**
-     * Only remove a player from the list of No-Clip players if said player has No-Clip enabled, i.e.
-     * {@link NoClipManager#isNoClip} is equal to {@code true}.
+     * Only remove a player from the list of No-Clip players if said player has No-Clip enabled, i.e. {@link NoClipManager#isNoClip} is equal to {@code true}.
      * <p>
      * Will also set the player to their previous {@link GameMode}.
      *

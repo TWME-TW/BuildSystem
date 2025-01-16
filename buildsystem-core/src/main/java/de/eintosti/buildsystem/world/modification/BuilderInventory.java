@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,6 +23,7 @@ import com.cryptomorin.xseries.profiles.objects.Profileable;
 import de.eintosti.buildsystem.BuildSystem;
 import de.eintosti.buildsystem.Messages;
 import de.eintosti.buildsystem.command.subcommand.worlds.AddBuilderSubCommand;
+import de.eintosti.buildsystem.tabcomplete.WorldsTabComplete.WorldsArgument;
 import de.eintosti.buildsystem.util.InventoryUtils;
 import de.eintosti.buildsystem.util.PaginatedInventory;
 import de.eintosti.buildsystem.util.StringUtils;
@@ -75,22 +76,14 @@ public class BuilderInventory extends PaginatedInventory implements Listener {
         if (creator == null || creator.getName().equalsIgnoreCase("-")) {
             inventoryUtils.addItemStack(inventory, 4, XMaterial.BARRIER, Messages.getString("worldeditor_builders_no_creator_item", player));
         } else {
-            inventoryUtils.addSkull(inventory, 4,
-                    Messages.getString("worldeditor_builders_creator_item", player),
-                    Profileable.of(creator.getUniqueId()),
-                    Messages.getString("worldeditor_builders_creator_lore", player,
-                            new AbstractMap.SimpleEntry<>("%creator%", buildWorld.getCreator().getName())
-                    )
-            );
+            inventoryUtils.addSkull(inventory, 4, Messages.getString("worldeditor_builders_creator_item", player), Profileable.of(creator.getUniqueId()), Messages.getString("worldeditor_builders_creator_lore", player, new AbstractMap.SimpleEntry<>("%creator%", buildWorld.getCreator()
+                    .getName())));
         }
     }
 
     private void addBuilderAddItem(Inventory inventory, BuildWorld buildWorld, Player player) {
         if (buildWorld.isCreator(player) || player.hasPermission(BuildSystem.ADMIN_PERMISSION)) {
-            inventoryUtils.addSkull(inventory, 22,
-                    Messages.getString("worldeditor_builders_add_builder_item", player),
-                    Profileable.detect("3edd20be93520949e6ce789dc4f43efaeb28c717ee6bfcbbe02780142f716")
-            );
+            inventoryUtils.addSkull(inventory, 22, Messages.getString("worldeditor_builders_add_builder_item", player), Profileable.detect("3edd20be93520949e6ce789dc4f43efaeb28c717ee6bfcbbe02780142f716"));
         } else {
             inventoryUtils.addGlassPane(plugin, player, inventory, 22);
         }
@@ -108,10 +101,14 @@ public class BuilderInventory extends PaginatedInventory implements Listener {
 
         int columnSkull = 9, maxColumnSkull = 17;
         for (Builder builder : builders) {
-            String builderName = builder.getName();
-            inventoryUtils.addSkull(inventory, columnSkull++,
-                    Messages.getString("worldeditor_builders_builder_item", player, new AbstractMap.SimpleEntry<>("%builder%", builderName)),
-                    Profileable.username(builderName), Messages.getStringList("worldeditor_builders_builder_lore", player)
+            inventoryUtils.addSkull(
+                    inventory,
+                    columnSkull++,
+                    Messages.getString("worldeditor_builders_builder_item", player,
+                            new AbstractMap.SimpleEntry<>("%builder%", builder.getName())
+                    ),
+                    Profileable.username(builder.getName()),
+                    Messages.getStringList("worldeditor_builders_builder_lore", player)
             );
 
             if (columnSkull > maxColumnSkull) {
@@ -156,9 +153,11 @@ public class BuilderInventory extends PaginatedInventory implements Listener {
 
         ItemStack itemStack = event.getCurrentItem();
         Material material = itemStack.getType();
-        if (material != XMaterial.PLAYER_HEAD.parseMaterial()) {
-            XSound.BLOCK_CHEST_OPEN.play(player);
-            plugin.getEditInventory().openInventory(player, buildWorld);
+        if (material != XMaterial.PLAYER_HEAD.get()) {
+            if (plugin.getWorldManager().isPermitted(player, WorldsArgument.EDIT.getPermission(), buildWorld.getName())) {
+                XSound.BLOCK_CHEST_OPEN.play(player);
+                plugin.getEditInventory().openInventory(player, buildWorld);
+            }
             return;
         }
 

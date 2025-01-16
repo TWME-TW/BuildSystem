@@ -5,7 +5,7 @@ author: einTosti
 main: de.eintosti.buildsystem.BuildSystem
 description: Powerful, easy to use system for builders
 website: https://buildsystem.eintosti.de
-softdepend: [ LuckPerms, PlaceholderAPI, WorldEdit ]
+softdepend: [ LuckPerms, PlaceholderAPI, WorldEdit, AxiomPaper ]
 
 commands:
   back:
@@ -67,11 +67,17 @@ commands:
     usage: /<command>
 
 permissions:
+  buildsystem.help:
+    children:
+      - buildsystem.help.buildsystem
+      - buildsystem.help.worlds
+    default: true
+    description: Permission for help commands.
   buildsystem.navigator:
     description: Open the worlds navigator.
     default: true
   buildsystem.navigator.item:
-    description: Receive and use the naviagtor open.
+    description: Receive and use the navigator.
     default: true
   buildsystem.create:
     children:

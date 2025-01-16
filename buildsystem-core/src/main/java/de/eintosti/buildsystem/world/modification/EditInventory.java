@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,6 @@ import de.eintosti.buildsystem.navigator.inventory.FilteredWorldsInventory.Visib
 import de.eintosti.buildsystem.player.PlayerManager;
 import de.eintosti.buildsystem.util.InventoryUtils;
 import de.eintosti.buildsystem.world.BuildWorld;
-import de.eintosti.buildsystem.world.Builder;
 import de.eintosti.buildsystem.world.data.WorldData;
 import java.util.AbstractMap;
 import java.util.List;
@@ -210,9 +209,7 @@ public class EditInventory implements Listener {
     }
 
     private void addBuildersItem(Player player, Inventory inventory, BuildWorld buildWorld) {
-        Builder creator = buildWorld.getCreator();
-        if ((creator != null && creator.getUniqueId().equals(player.getUniqueId()))
-                || player.hasPermission(BuildSystem.ADMIN_PERMISSION)) {
+        if (buildWorld.isCreator(player) || player.hasPermission(BuildSystem.ADMIN_PERMISSION)) {
             addSettingsItem(player, inventory, 30, XMaterial.IRON_PICKAXE, buildWorld.getData().buildersEnabled().get(),
                     "worldeditor_builders_item", "worldeditor_builders_lore"
             );
@@ -323,7 +320,7 @@ public class EditInventory implements Listener {
                 }
                 return;
             case 30:
-                if (itemStack.getType() == XMaterial.BARRIER.parseMaterial()) {
+                if (itemStack.getType() == XMaterial.BARRIER.get()) {
                     XSound.ENTITY_ITEM_BREAK.play(player);
                     return;
                 }
@@ -343,7 +340,7 @@ public class EditInventory implements Listener {
                 }
                 break;
             case 32:
-                if (itemStack.getType() == XMaterial.BARRIER.parseMaterial()) {
+                if (itemStack.getType() == XMaterial.BARRIER.get()) {
                     XSound.ENTITY_ITEM_BREAK.play(player);
                     return;
                 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,6 @@ import de.eintosti.buildsystem.player.LogoutLocation;
 import de.eintosti.buildsystem.player.PlayerManager;
 import de.eintosti.buildsystem.settings.Settings;
 import de.eintosti.buildsystem.settings.SettingsManager;
-import de.eintosti.buildsystem.util.UUIDFetcher;
 import de.eintosti.buildsystem.util.UpdateChecker;
 import de.eintosti.buildsystem.world.BuildWorld;
 import de.eintosti.buildsystem.world.SpawnManager;

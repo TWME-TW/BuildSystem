@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -66,8 +66,7 @@ public class WorldConfig extends ConfigurationFile {
     }
 
     /**
-     * Loads the {@link BuildWorld} if {@link ConfigValues#isUnloadWorlds()} is not enabled. Otherwise, the world will
-     * only be loaded if it's on the unload blacklist.
+     * Loads the {@link BuildWorld} if {@link ConfigValues#isUnloadWorlds()} is not enabled. Otherwise, the world will only be loaded if it's on the unload blacklist.
      *
      * @param buildWorld The world to load
      * @param alwaysLoad Should the world always be loaded

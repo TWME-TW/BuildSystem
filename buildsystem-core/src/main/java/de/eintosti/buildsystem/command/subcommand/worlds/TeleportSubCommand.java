@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -61,12 +61,12 @@ public class TeleportSubCommand implements SubCommand {
             return;
         }
 
-        String permission = buildWorld.getData().permission().get();
-        if (player.hasPermission(permission) || permission.equalsIgnoreCase("-")) {
-            worldManager.teleport(player, buildWorld);
-        } else {
+        if (!worldManager.canEnter(player, buildWorld)) {
             Messages.sendMessage(player, "worlds_tp_entry_forbidden");
+            return;
         }
+
+        worldManager.teleport(player, buildWorld);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -68,6 +68,7 @@ public enum CraftBukkitVersion {
     v1_20_R4(3839, CustomBlocks_1_20_R1.class, GameRules_1_13_R1.class),
     v1_21_R1(3953, CustomBlocks_1_20_R1.class, GameRules_1_13_R1.class),
     v1_21_R2(4082, CustomBlocks_1_20_R1.class, GameRules_1_13_R1.class),
+    v1_21_R3(4189, CustomBlocks_1_20_R1.class, GameRules_1_13_R1.class),
     UNKNOWN;
 
     private final int dataVersion;
@@ -152,7 +153,7 @@ public enum CraftBukkitVersion {
                     return v1_20_R1;
                 } else if (patch == 2) {
                     return v1_20_R2;
-                } else if (patch == 3 || patch == 4) {
+                } else if (patch <= 4) {
                     return v1_20_R3;
                 } else {
                     return v1_20_R4;
@@ -160,8 +161,10 @@ public enum CraftBukkitVersion {
             case 21:
                 if (patch <= 1) {
                     return v1_21_R1;
-                } else {
+                } else if (patch <= 3) {
                     return v1_21_R2;
+                } else {
+                    return v1_21_R3;
                 }
             default:
                 if (Boolean.getBoolean("Paper.ignoreWorldDataVersion")) {
@@ -180,8 +183,8 @@ public enum CraftBukkitVersion {
     /**
      * Gets the server's data version.
      * <p>
-     * "The data version is a positive integer used in a world saved data to denote a specific version, and determines
-     * whether the player should be warned about opening that world due to client version incompatibilities."
+     * "The data version is a positive integer used in a world saved data to denote a specific version, and determines whether the player should be warned about opening that world
+     * due to client version incompatibilities."
      *
      * @return The server's data version
      * @see <a href="https://minecraft.wiki/wiki/Data_version">Data version</a>

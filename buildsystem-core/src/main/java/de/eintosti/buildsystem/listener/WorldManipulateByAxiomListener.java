@@ -17,37 +17,37 @@
  */
 package de.eintosti.buildsystem.listener;
 
+import com.moulberry.axiom.event.AxiomModifyWorldEvent;
 import de.eintosti.buildsystem.BuildSystem;
-import de.eintosti.buildsystem.world.BuildWorld;
-import de.eintosti.buildsystem.world.WorldManager;
-import de.eintosti.buildsystem.world.data.WorldStatus;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
+import de.eintosti.buildsystem.event.EventDispatcher;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.jetbrains.annotations.NotNull;
 
-public class FoodLevelChangeListener implements Listener {
+/**
+ * Only register if axiom is available
+ */
+public class WorldManipulateByAxiomListener implements Listener {
 
-    private final WorldManager worldManager;
+    private final EventDispatcher dispatcher;
 
-    public FoodLevelChangeListener(BuildSystem plugin) {
-        this.worldManager = plugin.getWorldManager();
+
+    /**
+     * @param plugin plugin to register.
+     */
+    public WorldManipulateByAxiomListener(@NotNull BuildSystem plugin) {
+        this.dispatcher = new EventDispatcher(plugin.getWorldManager());
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    @EventHandler
-    public void onFoodLevelChangeEvent(FoodLevelChangeEvent event) {
-        if (!(event.getEntity() instanceof Player)) {
-            return;
-        }
 
-        Player player = (Player) event.getEntity();
-        World bukkitWorld = player.getWorld();
-        BuildWorld buildWorld = worldManager.getBuildWorld(bukkitWorld.getName());
-
-        if (buildWorld != null && buildWorld.getData().status().get() == WorldStatus.ARCHIVE) {
+    @EventHandler()
+    public void onWorldModification(AxiomModifyWorldEvent event) {
+        // I don't know if it is possible. Just to be safe.
+        if (!event.getPlayer().getWorld().equals(event.getWorld())) {
             event.setCancelled(true);
+            throw new IllegalStateException("Player modifies a world in which he is not present! The event got cancelled for safety reasons.");
         }
+        dispatcher.dispatchManipulationEventIfPlayerInBuildWorld(event.getPlayer(), event);
     }
 }

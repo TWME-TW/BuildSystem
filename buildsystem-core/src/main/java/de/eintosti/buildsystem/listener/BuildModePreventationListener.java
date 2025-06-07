@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,10 +17,10 @@
  */
 package de.eintosti.buildsystem.listener;
 
+import com.cryptomorin.xseries.inventory.XInventoryView;
 import de.eintosti.buildsystem.BuildSystem;
 import de.eintosti.buildsystem.config.ConfigValues;
 import de.eintosti.buildsystem.player.PlayerManager;
-import de.eintosti.buildsystem.util.CompatibilityUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -75,7 +75,7 @@ public class BuildModePreventationListener implements Listener {
             return;
         }
 
-        if (CompatibilityUtils.getTopInventory(event).getType() != InventoryType.CRAFTING) {
+        if (XInventoryView.of(event.getView()).getTopInventory().getType() != InventoryType.CRAFTING) {
             event.setCancelled(true);
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -73,7 +73,7 @@ public class BlockPhysicsListener implements Listener {
                 break;
             case REDSTONE_LAMP:
                 for (BlockFace blockFace : DirectionUtil.BLOCK_SIDES) {
-                    if (block.getRelative(blockFace).getType() == XMaterial.REDSTONE_BLOCK.parseMaterial()) {
+                    if (block.getRelative(blockFace).getType() == XMaterial.REDSTONE_BLOCK.get()) {
                         event.setCancelled(false);
                         return;
                     }

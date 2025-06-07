@@ -1,20 +1,20 @@
 [versions]
 # Platform expectations
-spigot = "1.21.1-R0.1-SNAPSHOT"
+spigot = "1.21.5-R0.1-SNAPSHOT"
 paperlib = "1.0.8"
 
 # Plugins
-luckperms = "5.4"
+luckperms = "5.5"
 worldedit = "7.2.20"
 placeholderapi = "2.11.6"
-
+axiompaper = "4.0.1-1.21.1"
 # Third Party
-annotations = "26.0.1"
+annotations = "26.0.2"
 authlib = "1.5.25"
 bstats = "3.1.0"
-fastboard = "2.1.3"
+fastboard = "2.1.4"
 nbt = "1.5.1"
-xseries = "11.3.0"
+xseries = "13.3.1"
 
 [libraries]
 # Platform expectations
@@ -25,6 +25,7 @@ paperlib = { group = "io.papermc", name = "paperlib", version.ref = "paperlib" }
 luckperms = { group = "net.luckperms", name = "api", version.ref = "luckperms" }
 placeholderapi = { group = "me.clip", name = "placeholderapi", version.ref = "placeholderapi" }
 worldedit = { group = "com.sk89q.worldedit", name = "worldedit-core", version.ref = "worldedit" }
+axiompaper= {group = "maven.modrinth.workaround", name = "axiom-paper-plugin", version.ref="axiompaper"}
 
 # Third Party
 annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }

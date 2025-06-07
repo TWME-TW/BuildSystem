@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@ package de.eintosti.buildsystem.util;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
+import com.cryptomorin.xseries.inventory.XInventoryView;
 import com.cryptomorin.xseries.messages.Titles;
 import com.cryptomorin.xseries.profiles.builder.XSkull;
 import com.cryptomorin.xseries.profiles.objects.Profileable;
@@ -85,7 +86,7 @@ public class InventoryUtils {
     }
 
     public boolean isNavigator(Player player, ItemStack itemStack) {
-        if (itemStack == null || itemStack.getType() != configValues.getNavigatorItem().parseMaterial()) {
+        if (itemStack == null || itemStack.getType() != configValues.getNavigatorItem().get()) {
             return false;
         }
 
@@ -126,7 +127,7 @@ public class InventoryUtils {
 
         for (int i = 0; i < playerInventory.getSize(); i++) {
             ItemStack currentItem = playerInventory.getItem(i);
-            if (currentItem != null && currentItem.getType() == findItemType.parseMaterial()) {
+            if (currentItem != null && currentItem.getType() == findItemType.get()) {
                 ItemMeta itemMeta = currentItem.getItemMeta();
                 if (itemMeta != null) {
                     if (itemMeta.getDisplayName().equals(findItemName)) {
@@ -140,7 +141,7 @@ public class InventoryUtils {
             playerInventory.setItem(slot, replaceItem);
         } else {
             ItemStack slot8 = playerInventory.getItem(8);
-            if (slot8 == null || slot8.getType() == XMaterial.AIR.parseMaterial()) {
+            if (slot8 == null || slot8.getType() == XMaterial.AIR.get()) {
                 playerInventory.setItem(8, replaceItem);
             } else {
                 playerInventory.addItem(replaceItem);
@@ -209,8 +210,8 @@ public class InventoryUtils {
     }
 
     public boolean checkIfValidClick(InventoryClickEvent event, String titleKey) {
-        if (!CompatibilityUtils.getInventoryTitle(event)
-                .equals(Messages.getString(titleKey, (Player) event.getWhoClicked()))) {
+        String title = XInventoryView.of(event.getView()).getTitle();
+        if (!title.equals(Messages.getString(titleKey, (Player) event.getWhoClicked()))) {
             return false;
         }
 
@@ -223,11 +224,7 @@ public class InventoryUtils {
         return true;
     }
 
-    public void addWorldItem(Player player, Inventory inventory, int position, BuildWorld buildWorld) {
-        String worldName = buildWorld.getName();
-        String displayName = Messages.getString("world_item_title", player, new AbstractMap.SimpleEntry<>("%world%", worldName));
-        List<String> lore = getLore(player, buildWorld);
-
+    public void addWorldItem(Inventory inventory, int position, BuildWorld buildWorld, String displayName, List<String> lore) {
         XMaterial material = buildWorld.getData().material().get();
         if (material != XMaterial.PLAYER_HEAD) {
             addItemStack(inventory, position, material, displayName, lore);
@@ -263,8 +260,8 @@ public class InventoryUtils {
      * Manage clicking in a {@link FilteredWorldsInventory}.
      * <p>
      * If the clicked item is the icon of a {@link BuildWorld}, the click is managed by
-     * {@link InventoryUtils#manageWorldItemClick(InventoryClickEvent, Player, ItemMeta, BuildWorld)}. Otherwise, the
-     * {@link NavigatorInventory} is opened if the glass pane at the bottom of the inventory is clicked.
+     * {@link InventoryUtils#manageWorldItemClick(InventoryClickEvent, Player, ItemMeta, BuildWorld)}. Otherwise, the {@link NavigatorInventory} is opened if the glass pane at the
+     * bottom of the inventory is clicked.
      *
      * @param event     The click event object to modify
      * @param player    The player who clicked
@@ -292,7 +289,7 @@ public class InventoryUtils {
             return;
         }
 
-        if (slot >= 45 && slot <= 53 && itemStack.getType() != XMaterial.PLAYER_HEAD.parseMaterial()) {
+        if (slot >= 45 && slot <= 53 && itemStack.getType() != XMaterial.PLAYER_HEAD.get()) {
             XSound.BLOCK_CHEST_OPEN.play(player);
             plugin.getNavigatorInventory().openInventory(player);
         }
@@ -303,10 +300,9 @@ public class InventoryUtils {
      * <p>
      * If the click is a...
      * <ul>
-     *   <l>...left click, the world is loaded (if previously unloaded) and the player is teleported to said world.</li>
+     *   <li>...left click, the world is loaded (if previously unloaded) and the player is teleported to said world.</li>
      *   <li>...right click and the player is permitted to edit the world {@link WorldManager#isPermitted(Player, String, String)},
-     *       the {@link EditInventory} for the world is opened for said player.
-     *       If the player does not the the required permission the click is handled as a normal left click.</li>
+     *       the {@link EditInventory} for the world is opened for said player. If the player does not the required permission the click is handled as a normal left click.</li>
      * </ul>
      *
      * @param event      The click event to modify
@@ -365,8 +361,7 @@ public class InventoryUtils {
     }
 
     /**
-     * Gets the worlds in the order they are to be displayed. First, the {@link WorldFilter} is applied. Then, the list
-     * of worlds is sorted using the {@link WorldSort}.
+     * Gets the worlds in the order they are to be displayed. First, the {@link WorldFilter} is applied. Then, the list of worlds is sorted using the {@link WorldSort}.
      *
      * @param worldManager The world manager object
      * @param settings     The settings that provide the sorting method
@@ -418,15 +413,14 @@ public class InventoryUtils {
      * @param buildWorld The world the lore displays information about
      * @return The formatted lore
      */
-    private List<String> getLore(Player player, BuildWorld buildWorld) {
+    public List<String> getWorldLore(Player player, BuildWorld buildWorld) {
         WorldData worldData = buildWorld.getData();
         @SuppressWarnings("unchecked")
         Map.Entry<String, Object>[] placeholders = new Map.Entry[]{
                 new AbstractMap.SimpleEntry<>("%status%", worldData.status().get().getName(player)),
                 new AbstractMap.SimpleEntry<>("%project%", worldData.project().get()),
                 new AbstractMap.SimpleEntry<>("%permission%", worldData.permission().get()),
-                new AbstractMap.SimpleEntry<>("%creator%",
-                        buildWorld.hasCreator() ? buildWorld.getCreator().getName() : "-"),
+                new AbstractMap.SimpleEntry<>("%creator%", buildWorld.hasCreator() ? buildWorld.getCreator().getName() : "-"),
                 new AbstractMap.SimpleEntry<>("%creation%", Messages.formatDate(buildWorld.getCreationDate())),
                 new AbstractMap.SimpleEntry<>("%lastedited%", Messages.formatDate(worldData.lastEdited().get())),
                 new AbstractMap.SimpleEntry<>("%lastloaded%", Messages.formatDate(worldData.lastLoaded().get())),

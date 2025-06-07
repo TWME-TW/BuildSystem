@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -179,8 +179,8 @@ public class WorldManager {
     }
 
     /**
-     * Gets the name (and in doing so removes all illegal characters) of the {@link BuildWorld} the player is trying to
-     * create. If the world is going to be a private world, its name will be equal to the player's name.
+     * Gets the name (and in doing so removes all illegal characters) of the {@link BuildWorld} the player is trying to create. If the world is going to be a private world, its
+     * name will be equal to the player's name.
      *
      * @param player       The player who is creating the world
      * @param worldType    The world type
@@ -392,8 +392,7 @@ public class WorldManager {
     }
 
     /**
-     * Delete an existing {@link BuildWorld}. In comparison to {@link #unimportWorld(Player, BuildWorld, boolean)},
-     * deleting a world deletes the world's directory.
+     * Delete an existing {@link BuildWorld}. In comparison to {@link #unimportWorld(Player, BuildWorld, boolean)}, deleting a world deletes the world's directory.
      *
      * @param player     The player who issued the deletion
      * @param buildWorld The world to be deleted
@@ -421,8 +420,7 @@ public class WorldManager {
     }
 
     /**
-     * Unimport an existing {@link BuildWorld}. In comparison to {@link #deleteWorld(Player, BuildWorld)}, unimporting a
-     * world does not delete the world's directory.
+     * Unimport an existing {@link BuildWorld}. In comparison to {@link #deleteWorld(Player, BuildWorld)}, unimporting a world does not delete the world's directory.
      *
      * @param player     The player unloading the world
      * @param buildWorld The build world object
@@ -439,8 +437,7 @@ public class WorldManager {
     }
 
     /**
-     * In order to properly unload/rename/delete a world, no players may be present in the {@link World}. Removes all
-     * player's from the world to insure proper manipulation.
+     * In order to properly unload/rename/delete a world, no players may be present in the {@link World}. Removes all player's from the world to insure proper manipulation.
      *
      * @param worldName The name of the world
      * @param message   The message sent to a player when they are removed from the world
@@ -641,8 +638,7 @@ public class WorldManager {
     }
 
     /**
-     * In order to correctly teleport a player to a {@link Location}, the block underneath the player's feet must be
-     * solid.
+     * In order to correctly teleport a player to a {@link Location}, the block underneath the player's feet must be solid.
      *
      * @param location The location the player will be teleported to
      */
@@ -661,8 +657,29 @@ public class WorldManager {
         return ground.getType().isSolid();
     }
 
+    /**
+     * Determines whether the player can enter the specified build world.
+     * <p>
+     * The following logic is applied to decide if the player can enter:
+     * <ul>
+     *   <li>Does the player have the {@link BuildSystem#ADMIN_PERMISSION} or can bypass the world's permission?</li>
+     *   <li>Is the player the creator of the build world?</li>
+     *   <li>Is the player a builder for the build world?</li>
+     *   <li>Does the build world have a specific permission, and does the player have that permission?</li>
+     *   <li>If no specific permission is set (denoted by {@code "-"}), entry is allowed.</li>
+     * </ul>
+     *
+     * @param player     The player whose access is being evaluated
+     * @param buildWorld The build world the player is attempting to enter
+     * @return {@code true} if the player can enter the build world, {@code false} otherwise
+     * @see #canBypassWorldPermission(Player, BuildWorld)
+     */
     public boolean canEnter(Player player, BuildWorld buildWorld) {
-        if (player.hasPermission(BuildSystem.ADMIN_PERMISSION)) {
+        if (player.hasPermission(BuildSystem.ADMIN_PERMISSION) || canBypassWorldPermission(player, buildWorld)) {
+            return true;
+        }
+
+        if (buildWorld.isCreator(player) || buildWorld.isBuilder(player)) {
             return true;
         }
 
@@ -671,11 +688,31 @@ public class WorldManager {
             return true;
         }
 
-        if (buildWorld.isCreator(player) || buildWorld.isBuilder(player)) {
-            return true;
+        return player.hasPermission(permission);
+    }
+
+    /**
+     * Determines whether the player has permission to bypass restrictions for a specific build world.
+     * <p>
+     * <ul>
+     *   <li>If the world is public, does the player have the permission {@code buildsystem.bypass.permission.public}?</li>
+     *   <li>If the world is archived, does the player have the permission {@code buildsystem.bypass.permission.archive}?</li>
+     *   <li>If the world is private, does the player have the permission {@code buildsystem.bypass.permission.private}?</li>
+     * </ul>
+     *
+     * @param player     The player whose permissions will be checked
+     * @param buildWorld The build world for which bypass permissions are evaluated
+     * @return {@code true} if the player has bypass permissions for the specified world, {@code false} otherwise
+     */
+    private boolean canBypassWorldPermission(Player player, BuildWorld buildWorld) {
+        WorldData worldData = buildWorld.getData();
+        if (worldData.status().get() == WorldStatus.ARCHIVE) {
+            return player.hasPermission("buildsystem.bypass.permission.archive");
         }
 
-        return player.hasPermission(permission);
+        return worldData.privateWorld().get()
+                ? player.hasPermission("buildsystem.bypass.permission.private")
+                : player.hasPermission("buildsystem.bypass.permission.public");
     }
 
     public boolean canBypassBuildRestriction(Player player) {

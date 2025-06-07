@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -204,7 +204,7 @@ public class SettingsInteractListener implements Listener {
         }
 
         Block adjacent = clickedBlock.getRelative(blockFace);
-        if (adjacent.getType() != XMaterial.AIR.parseMaterial()) {
+        if (adjacent.getType() != XMaterial.AIR.get()) {
             return;
         }
 
@@ -240,7 +240,7 @@ public class SettingsInteractListener implements Listener {
                         .replace("_SIGN", ""); // Get wood type
                 String block = isHangingSign ? "_WALL_HANGING_SIGN" : "_WALL_SIGN";
                 BlockFace facing = isHangingSign ? getHangingSignDirection(event) : blockFace;
-                XMaterial.matchXMaterial(woodType + block).ifPresent(value -> adjacent.setType(value.parseMaterial()));
+                XMaterial.matchXMaterial(woodType + block).ifPresent(value -> adjacent.setType(value.get()));
                 customBlocks.rotateBlock(adjacent, player, facing);
                 break;
             default:
@@ -372,8 +372,8 @@ public class SettingsInteractListener implements Listener {
     }
 
     /**
-     * Stop {@link Player} from opening {@link Inventory} because the event should be cancelled as it was fired due to
-     * an interaction caused in {@link SettingsInteractListener#manageDisabledInteractSetting}
+     * Stop {@link Player} from opening {@link Inventory} because the event should be cancelled as it was fired due to an interaction caused in
+     * {@link SettingsInteractListener#manageDisabledInteractSetting}
      */
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent event) {

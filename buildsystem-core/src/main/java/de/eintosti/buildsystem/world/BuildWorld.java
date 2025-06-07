@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -59,8 +59,8 @@ public class BuildWorld implements ConfigurationSerializable {
     private final long creationDate;
     private final CustomGenerator customGenerator;
     private final List<Builder> builders;
-  private String name;
-  private Builder creator;
+    private String name;
+    private Builder creator;
     private long seconds;
     private boolean loaded;
     private BukkitTask unloadTask;
@@ -114,8 +114,8 @@ public class BuildWorld implements ConfigurationSerializable {
                 material = inventoryUtils.getDefaultItem(WorldType.IMPORTED);
                 break;
             default:
-              throw new IllegalArgumentException(
-                  "Unsupported world type '" + worldType.name() + "' for world " + name);
+                throw new IllegalArgumentException(
+                        "Unsupported world type '" + worldType.name() + "' for world " + name);
         }
         if (privateWorld) {
             material = XMaterial.PLAYER_HEAD;
@@ -243,8 +243,7 @@ public class BuildWorld implements ConfigurationSerializable {
     /**
      * Get the creation date of the world.
      *
-     * @return The amount of milliseconds that have passed since {@code January 1, 1970 UTC}, until the world was
-     * created.
+     * @return The amount of milliseconds that have passed since {@code January 1, 1970 UTC}, until the world was created.
      */
     public long getCreationDate() {
         return creationDate;
@@ -366,7 +365,7 @@ public class BuildWorld implements ConfigurationSerializable {
      * @return Whether the player is a builder
      */
     public boolean isBuilder(UUID uuid) {
-        return this.builders.parallelStream().anyMatch(builder -> builder.getUniqueId().equals(uuid));
+        return this.builders.stream().anyMatch(builder -> builder.getUniqueId().equals(uuid));
     }
 
     /**

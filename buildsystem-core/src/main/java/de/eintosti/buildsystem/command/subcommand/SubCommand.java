@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,9 +26,7 @@ public interface SubCommand {
     Argument getArgument();
 
     default boolean hasPermission(Player player) {
-        if (getArgument().getPermission() == null) {
-            return true;
-        }
-        return player.hasPermission(getArgument().getPermission());
+        String permission = getArgument().getPermission();
+        return permission == null || player.hasPermission(permission);
     }
 }

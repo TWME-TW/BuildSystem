@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,7 +47,7 @@ public class BuildTabComplete extends ArgumentSorter implements TabCompleter {
         }
 
         if (args.length == 1) {
-            if (!player.hasPermission("buildsystem.build.others")) {
+            if (!player.hasPermission("buildsystem.build.other")) {
                 Bukkit.getOnlinePlayers().forEach(pl -> addArgument(args[0], pl.getName(), arrayList));
             }
         }

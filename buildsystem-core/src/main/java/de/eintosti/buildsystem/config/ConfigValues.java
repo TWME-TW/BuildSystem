@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -166,8 +166,7 @@ public class ConfigValues {
     }
 
     /**
-     * Parsing the {@link GameMode} from a string. Defaulting to {@link GameMode#ADVENTURE} if the string is not a valid
-     * {@link GameMode}.
+     * Parsing the {@link GameMode} from a string. Defaulting to {@link GameMode#ADVENTURE} if the string is not a valid {@link GameMode}.
      *
      * @param gameModeName The name of the {@link GameMode} to parse.
      * @return The parsed {@link GameMode}.

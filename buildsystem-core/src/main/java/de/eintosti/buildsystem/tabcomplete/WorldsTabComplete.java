@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -190,11 +190,11 @@ public class WorldsTabComplete extends ArgumentSorter implements TabCompleter {
         BUILDERS("builders", "buildsystem.builders"),
         DELETE("delete", "buildsystem.delete"),
         EDIT("edit", "buildsystem.edit"),
-        HELP("help", null),
+        HELP("help", "buildsystem.help.worlds"),
         IMPORT("import", "buildsystem.import"),
         IMPORT_ALL("importAll", "buildsystem.import.all"),
         INFO("info", "buildsystem.info"),
-        ITEM("item", null),
+        ITEM("item", "buildsystem.navigator.item"),
         REMOVE_BUILDER("removeBuilder", "buildsystem.removebuilder"),
         RENAME("rename", "buildsystem.rename"),
         SET_CREATOR("setCreator", "buildsystem.setcreator"),

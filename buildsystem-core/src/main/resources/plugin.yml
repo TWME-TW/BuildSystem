@@ -5,7 +5,7 @@ author: einTosti
 main: de.eintosti.buildsystem.BuildSystem
 description: Powerful, easy to use system for builders
 website: https://buildsystem.eintosti.de
-softdepend: [ LuckPerms, PlaceholderAPI, WorldEdit ]
+softdepend: [ LuckPerms, PlaceholderAPI, WorldEdit, AxiomPaper ]
 
 commands:
   back:
@@ -67,11 +67,17 @@ commands:
     usage: /<command>
 
 permissions:
+  buildsystem.help:
+    children:
+      - buildsystem.help.buildsystem
+      - buildsystem.help.worlds
+    default: true
+    description: Permission for help commands.
   buildsystem.navigator:
     description: Open the worlds navigator.
     default: true
   buildsystem.navigator.item:
-    description: Receive and use the naviagtor open.
+    description: Receive and use the navigator.
     default: true
   buildsystem.create:
     children:
@@ -93,6 +99,22 @@ permissions:
       - buildsystem.setstatus.notstarted
     default: op
     description: Permission for specific status states
+  buildsystem.gamemode:
+    children:
+      - buildsystem.gamemode.survival
+      - buildsystem.gamemode.creative
+      - buildsystem.gamemode.adventure
+      - buildsystem.gamemode.spectator
+    default: op
+    description: Permission for changing own gamemode
+  buildsystem.gamemode.other:
+    children:
+      - buildsystem.gamemode.survival.other
+      - buildsystem.gamemode.creative.other
+      - buildsystem.gamemode.adventure.other
+      - buildsystem.gamemode.spectator.other
+    default: op
+    description: Permission for changing other player's gamemode
   buildsystem.physics.message:
     description: Receive the message that physics are disabled in a world.
     default: true

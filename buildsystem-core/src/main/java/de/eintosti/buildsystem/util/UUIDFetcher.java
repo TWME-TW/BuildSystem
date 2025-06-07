@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,6 +23,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import de.eintosti.buildsystem.util.ServerModeChecker.ServerMode;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -33,6 +34,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import org.bukkit.Bukkit;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class UUIDFetcher {
@@ -49,10 +52,17 @@ public class UUIDFetcher {
      * @param name The name of the player whose uuid is to be fetched
      * @return The uuid which belongs to the player
      */
+    @Nullable
     public static UUID getUUID(String name) {
         String lowerCase = name.toLowerCase(Locale.ROOT);
         if (UUID_CACHE.containsKey(lowerCase)) {
             return UUID_CACHE.get(lowerCase);
+        }
+
+        if (ServerModeChecker.getServerMode() == ServerMode.OFFLINE) {
+            UUID uuid = Bukkit.getOfflinePlayer(name).getUniqueId();
+            cacheUser(uuid, name);
+            return uuid;
         }
 
         try {
@@ -62,16 +72,13 @@ public class UUIDFetcher {
             JsonObject jsonObject;
             try {
                 // Support older versions of JSON used by Minecraft versions <1.18
-                jsonObject = new JsonParser().parse(new BufferedReader(new InputStreamReader(connection.getInputStream())))
-                        .getAsJsonObject();
+                jsonObject = new JsonParser().parse(new BufferedReader(new InputStreamReader(connection.getInputStream()))).getAsJsonObject();
             } catch (IllegalStateException | FileNotFoundException ignored) {
                 return null;
             }
 
             UUID uuid = UUIDTypeAdapter.fromString(jsonObject.get("id").getAsString());
-            UUID_CACHE.put(lowerCase, uuid);
-            NAME_CACHE.put(uuid, name);
-
+            cacheUser(uuid, name);
             return uuid;
         } catch (Exception e) {
             e.printStackTrace();
@@ -86,28 +93,35 @@ public class UUIDFetcher {
      * @param uuid The uuid of the player whose name is to be fetched
      * @return The name which belongs to the player
      */
+    @Nullable
     public static String getName(UUID uuid) {
         if (NAME_CACHE.containsKey(uuid)) {
             return NAME_CACHE.get(uuid);
         }
 
+        if (ServerModeChecker.getServerMode() == ServerMode.OFFLINE) {
+            String name = Bukkit.getOfflinePlayer(uuid).getName();
+            if (name != null) {
+                cacheUser(uuid, name);
+            }
+            return name;
+        }
+
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(String.format(Locale.ROOT, NAME_URL, UUIDTypeAdapter.fromUUID(uuid))).openConnection();
             connection.setReadTimeout(5000);
+
             JsonArray nameHistory;
             try {
                 // Support older versions of JSON used by Minecraft versions <1.18
-                nameHistory = new JsonParser().parse(new BufferedReader(new InputStreamReader(connection.getInputStream())))
-                        .getAsJsonArray();
+                nameHistory = new JsonParser().parse(new BufferedReader(new InputStreamReader(connection.getInputStream()))).getAsJsonArray();
             } catch (IllegalStateException ignored) {
                 return null;
             }
+
             JsonObject currentNameData = nameHistory.get(nameHistory.size() - 1).getAsJsonObject();
-
             String name = currentNameData.get("name").getAsString();
-            UUID_CACHE.put(name, uuid);
-            NAME_CACHE.put(uuid, name);
-
+            cacheUser(uuid, name);
             return name;
         } catch (Exception e) {
             e.printStackTrace();

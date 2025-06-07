@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -76,33 +76,33 @@ public class WorldFilter implements ConfigurationSerializable {
         return display;
     }
 
-  public enum Mode {
-    NONE("world_filter_mode_none"),
-    STARTS_WITH("world_filter_mode_starts_with"),
-    CONTAINS("world_filter_mode_contains"),
-    MATCHES("world_filter_mode_matches");
+    public enum Mode {
+        NONE("world_filter_mode_none"),
+        STARTS_WITH("world_filter_mode_starts_with"),
+        CONTAINS("world_filter_mode_contains"),
+        MATCHES("world_filter_mode_matches");
 
-    private final String loreKey;
+        private final String loreKey;
 
-    Mode(String loreKey) {
-      this.loreKey = loreKey;
+        Mode(String loreKey) {
+            this.loreKey = loreKey;
+        }
+
+        public String getLoreKey() {
+            return loreKey;
+        }
+
+        public Mode getNext() {
+            switch (this) {
+                default: // NONE
+                    return STARTS_WITH;
+                case STARTS_WITH:
+                    return CONTAINS;
+                case CONTAINS:
+                    return MATCHES;
+                case MATCHES:
+                    return NONE;
+            }
+        }
     }
-
-    public String getLoreKey() {
-      return loreKey;
-    }
-
-    public Mode getNext() {
-      switch (this) {
-        default: // NONE
-          return STARTS_WITH;
-        case STARTS_WITH:
-          return CONTAINS;
-        case CONTAINS:
-          return MATCHES;
-        case MATCHES:
-          return NONE;
-      }
-    }
-  }
 }

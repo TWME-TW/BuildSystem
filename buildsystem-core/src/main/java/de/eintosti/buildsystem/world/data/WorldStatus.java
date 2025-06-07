@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -84,8 +84,7 @@ public enum WorldStatus {
     }
 
     /**
-     * Gets the stage in which the {@link BuildWorld} is currently in. A higher value means the world is further in
-     * development.
+     * Gets the stage in which the {@link BuildWorld} is currently in. A higher value means the world is further in development.
      *
      * @return the stage in which the world is currently in.
      */

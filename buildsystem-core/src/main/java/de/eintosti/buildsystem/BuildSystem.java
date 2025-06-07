@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -62,6 +62,7 @@ import de.eintosti.buildsystem.listener.PlayerTeleportListener;
 import de.eintosti.buildsystem.listener.SettingsInteractListener;
 import de.eintosti.buildsystem.listener.SignChangeListener;
 import de.eintosti.buildsystem.listener.WeatherChangeListener;
+import de.eintosti.buildsystem.listener.WorldManipulateByAxiomListener;
 import de.eintosti.buildsystem.listener.WorldManipulateListener;
 import de.eintosti.buildsystem.navigator.ArmorStandManager;
 import de.eintosti.buildsystem.navigator.inventory.ArchiveInventory;
@@ -218,7 +219,6 @@ public class BuildSystem extends JavaPlugin {
             playerManager.closeNavigator(pl);
         });
 
-        reloadConfig();
         reloadConfigData(false);
         saveConfig();
 
@@ -380,6 +380,11 @@ public class BuildSystem extends JavaPlugin {
             this.luckPermsExpansion.registerAll();
         }
 
+        if (pluginManager.getPlugin("AxiomPaper") != null) {
+            new WorldManipulateByAxiomListener(this);
+            getLogger().info("Axiom build-world manipulation prevention has been enabled.");
+        }
+
         boolean isWorldEdit = pluginManager.getPlugin("WorldEdit") != null
                 || pluginManager.getPlugin("FastAsyncWorldEdit") != null;
         if (isWorldEdit && configValues.isBlockWorldEditNonBuilder()) {
@@ -449,11 +454,17 @@ public class BuildSystem extends JavaPlugin {
         Messages.sendMessage(sender, "no_permissions");
     }
 
+    /**
+     * Reloads the config and config data.
+     *
+     * @param init Whether the plugin should reinitialize classes
+     */
     public void reloadConfigData(boolean init) {
         for (Player pl : Bukkit.getOnlinePlayers()) {
             getSettingsManager().stopScoreboard(pl);
         }
 
+        reloadConfig();
         configValues.setConfigValues();
 
         if (init) {

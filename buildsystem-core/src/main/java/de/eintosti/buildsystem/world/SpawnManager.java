@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024, Thomas Meaney
+ * Copyright (c) 2018-2025, Thomas Meaney
  * Copyright (c) contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -114,8 +114,8 @@ public class SpawnManager {
 
         BuildWorld buildWorld = worldManager.getBuildWorld(worldName);
         if (buildWorld == null) {
-          plugin.getLogger()
-              .warning("Could load spawn world \"" + worldName + "\". Please check logs for possible errors.");
+            plugin.getLogger()
+                    .warning("Could load spawn world \"" + worldName + "\". Please check logs for possible errors.");
             return;
         }
 

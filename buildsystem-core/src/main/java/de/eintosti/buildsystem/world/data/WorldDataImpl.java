@@ -68,6 +68,7 @@ public class WorldDataImpl implements WorldData {
     private final Type<Long> lastEdited;
     private final Type<Long> lastLoaded;
     private final Type<Long> lastUnloaded;
+    private final Type<String> resourcePackUrl;
 
     private WorldDataImpl(WorldDataBuilder builder) {
         this.worldName = builder.worldName;
@@ -123,6 +124,7 @@ public class WorldDataImpl implements WorldData {
         this.lastEdited = register("last-edited", new ConfigurableType<>(builder.lastEdited));
         this.lastLoaded = register("last-loaded", new ConfigurableType<>(builder.lastLoaded));
         this.lastUnloaded = register("last-unloaded", new ConfigurableType<>(builder.lastUnloaded));
+        this.resourcePackUrl = register("resource-pack-url", new ConfigurableType<>(builder.resourcePackUrl));
     }
 
     /**
@@ -254,6 +256,11 @@ public class WorldDataImpl implements WorldData {
         return lastUnloaded;
     }
 
+    @Override
+    public Type<String> resourcePackUrl() {
+        return resourcePackUrl;
+    }
+
     public void setWorldName(String worldName) {
         this.worldName = worldName;
     }
@@ -285,6 +292,7 @@ public class WorldDataImpl implements WorldData {
         private long lastEdited = -1L;
         private long lastLoaded = -1L;
         private long lastUnloaded = -1L;
+        private String resourcePackUrl = "-";
 
         /**
          * Creates a new builder for {@link WorldData}.
@@ -391,6 +399,11 @@ public class WorldDataImpl implements WorldData {
 
         public WorldDataBuilder withLastUnloaded(long lastUnloaded) {
             this.lastUnloaded = lastUnloaded;
+            return this;
+        }
+
+        public WorldDataBuilder withResourcePackUrl(String resourcePackUrl) {
+            this.resourcePackUrl = resourcePackUrl;
             return this;
         }
     }

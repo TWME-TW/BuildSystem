@@ -92,6 +92,7 @@ public class Messages {
         setMessage(config, sb, "enter_world_creator", "&7Enter &bWorld Creator");
         setMessage(config, sb, "enter_world_permission", "&7Enter &bPermission");
         setMessage(config, sb, "enter_world_project", "&7Enter &bProject");
+        setMessage(config, sb, "enter_resource_pack_url", "&7Enter &bResource Pack URL");
         setMessage(config, sb, "enter_player_name", "&7Enter &bPlayer Name");
         setMessage(config, sb, "cancel_subtitle", "&7Type &ccancel &7to cancel");
         setMessage(config, sb, "input_cancelled", "%prefix% &cInput cancelled!");
@@ -756,6 +757,19 @@ public class Messages {
                 "&7&oChange the world's permission.",
                 "",
                 "&7&nCurrently&7: &b%permission%"
+        ));
+        addSpacer(sb, "");
+        setMessage(config, sb, "worldeditor_resourcepack_item", "&bResource Pack");
+        setMessage(config, sb, "worldeditor_resourcepack_lore", Arrays.asList(
+                "&7&oSet a custom resource pack",
+                "&7&oURL for this world.",
+                "",
+                "&7&nCurrently&7: &b%url%"
+        ));
+        setMessage(config, sb, "worldeditor_resourcepack_not_creator_item", "&c&mResource Pack");
+        setMessage(config, sb, "worldeditor_resourcepack_not_creator_lore", Arrays.asList(
+                "&7&oYou are not the creator",
+                "&7&oof this world."
         ));
         addSpacer(sb, "");
         addSpacer(sb, "# Settings");

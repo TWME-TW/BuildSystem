@@ -172,6 +172,13 @@ public interface WorldData {
     Type<Long> lastUnloaded();
 
     /**
+     * Retrieves a {@link Type} object representing the resource pack URL of the {@link BuildWorld}.
+     *
+     * @return A {@link Type} containing the resource pack URL string
+     */
+    Type<String> resourcePackUrl();
+
+    /**
      * Gets a map of all configurable data points for the {@link BuildWorld}.
      *
      * @return An unmodifiable map where keys are data point names and values are their corresponding {@link Type} objects

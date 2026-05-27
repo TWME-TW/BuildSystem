@@ -85,7 +85,21 @@ public class PlayerChangedWorldListener implements Listener {
             oldWorld.getUnloader().resetUnloadTask();
         }
 
+        if (oldWorld != null) {
+            String oldResourcePack = oldWorld.getData().resourcePackUrl().get();
+            if (!oldResourcePack.isEmpty() && !oldResourcePack.equals("-")) {
+                removeResourcePack(player);
+            }
+        }
+
         BuildWorld newWorld = worldStorage.getBuildWorld(worldName);
+        if (newWorld != null) {
+            String newResourcePack = newWorld.getData().resourcePackUrl().get();
+            if (!newResourcePack.isEmpty() && !newResourcePack.equals("-")) {
+                applyResourcePack(player, newResourcePack);
+            }
+        }
+
         if (newWorld != null && !newWorld.getData().physics().get() && player.hasPermission("buildsystem.physics.message")) {
             Messages.sendMessage(player, "physics_deactivated_in_world", Map.entry("%world%", newWorld.getName()));
         }
@@ -196,5 +210,14 @@ public class PlayerChangedWorldListener implements Listener {
         playerInventory.setChestplate(null);
         playerInventory.setLeggings(null);
         playerInventory.setBoots(null);
+    }
+
+    @SuppressWarnings("deprecation")
+    private void applyResourcePack(Player player, String url) {
+        player.setResourcePack(url);
+    }
+
+    private void removeResourcePack(Player player) {
+        player.removeResourcePacks();
     }
 }

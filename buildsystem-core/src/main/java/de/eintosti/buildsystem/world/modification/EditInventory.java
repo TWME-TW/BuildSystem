@@ -31,6 +31,7 @@ import de.eintosti.buildsystem.command.subcommand.worlds.SetPermissionSubCommand
 import de.eintosti.buildsystem.command.subcommand.worlds.SetProjectSubCommand;
 import de.eintosti.buildsystem.config.Config.World.Default;
 import de.eintosti.buildsystem.player.PlayerServiceImpl;
+import de.eintosti.buildsystem.util.PlayerChatInput;
 import de.eintosti.buildsystem.util.inventory.BuildWorldHolder;
 import de.eintosti.buildsystem.util.inventory.InventoryHandler;
 import de.eintosti.buildsystem.util.inventory.InventoryManager;
@@ -137,6 +138,7 @@ public class EditInventory implements InventoryHandler {
                         Map.entry("%permission%", buildWorld.getData().permission().get())
                 )
         ));
+        addResourcePackItem(player, inventory, buildWorld);
 
         return inventory;
     }
@@ -257,6 +259,23 @@ public class EditInventory implements InventoryHandler {
                         Map.entry("%difficulty%", getDifficultyName(buildWorld, player))
                 )
         ));
+    }
+
+    private void addResourcePackItem(Player player, Inventory inventory, BuildWorld buildWorld) {
+        if (buildWorld.getBuilders().isCreator(player) || player.hasPermission(BuildSystemPlugin.ADMIN_PERMISSION)) {
+            String currentUrl = buildWorld.getData().resourcePackUrl().get();
+            inventory.setItem(43, InventoryUtils.createItem(XMaterial.CHEST,
+                    Messages.getString("worldeditor_resourcepack_item", player),
+                    Messages.getStringList("worldeditor_resourcepack_lore", player,
+                            Map.entry("%url%", currentUrl)
+                    )
+            ));
+        } else {
+            inventory.setItem(43, InventoryUtils.createItem(XMaterial.BARRIER,
+                    Messages.getString("worldeditor_resourcepack_not_creator_item", player),
+                    Messages.getStringList("worldeditor_resourcepack_not_creator_lore", player)
+            ));
+        }
     }
 
     /**
@@ -390,6 +409,16 @@ public class EditInventory implements InventoryHandler {
                 }
                 return;
             }
+            case 43 -> {
+                if (itemStack.getType() == XMaterial.BARRIER.get()) {
+                    XSound.ENTITY_ITEM_BREAK.play(player);
+                    return;
+                }
+                if (buildWorld.getBuilders().isCreator(player) || player.hasPermission(BuildSystemPlugin.ADMIN_PERMISSION)) {
+                    getResourcePackInput(player, buildWorld);
+                }
+                return;
+            }
             default -> {
                 return;
             }
@@ -435,6 +464,14 @@ public class EditInventory implements InventoryHandler {
 
         player.closeInventory();
         Messages.sendMessage(player, "worldeditor_butcher_removed", Map.entry("%amount%", entitiesRemoved.get()));
+    }
+
+    private void getResourcePackInput(Player player, BuildWorld buildWorld) {
+        new PlayerChatInput(plugin, player, "enter_resource_pack_url", input -> {
+            buildWorld.getData().resourcePackUrl().set(input.trim());
+            XSound.ENTITY_PLAYER_LEVELUP.play(player);
+            openInventory(player, buildWorld);
+        });
     }
 
     public enum Time {

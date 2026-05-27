@@ -207,7 +207,7 @@ public class YamlWorldStorage extends WorldStorageImpl {
                 .withTimeSinceBackup(config.getInt(path + ".time-since-backup", 0))
                 .withLastLoaded(config.getLong(path + ".last-loaded"))
                 .withLastUnloaded(config.getLong(path + ".last-unloaded"))
-                .withLastEdited(config.getLong(path + ".last-edited"))
+                .withResourcePackUrl(config.getString(path + ".resource-pack-url", "-"))
                 .build();
     }
 
